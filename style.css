@@ -3,45 +3,161 @@
     --success-color: #28a745;
     --warning-color: #ffc107;
     --bg-color: #f8f9fa;
-    --card-bg: #ffffff;
+    --card-bg: #927a7a;
     --text-color: #333333;
     --border-color: #dee2e6;
+    --navbar-height: 65px;
 }
 
+/* AJUSTEMENT DU BODY POUR GÉRER L'EN-TÊTE FIXE ET LES SAFE AREAS */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
-    margin: 0; padding: 90px 20px 20px 20px;
-    display: flex; justify-content: center;
+    margin: 0; 
+    padding: calc(var(--navbar-height) + 20px + env(safe-area-inset-top)) 20px 20px 20px;
+    display: flex; 
+    justify-content: center;
 }
 
-/* NAVBAR SUPÉRIEURE FIXE */
+/* NAVBAR STRUCTURE (MOBILE-FIRST) */
 .navbar {
     position: fixed;
-    top: 0; left: 0; width: 100%; height: 65px;
+    top: 0; left: 0; width: 100%; 
+    height: calc(var(--navbar-height) + env(safe-area-inset-top));
     background-color: #ffffff;
     border-bottom: 1px solid var(--border-color);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 30px; box-sizing: border-box; z-index: 999;
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    padding: env(safe-area-inset-top) 20px 0 20px; /* Prise en compte de la fente/encoche */
+    box-sizing: border-box; 
+    z-index: 1000;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-.nav-brand { font-size: 20px; font-weight: bold; color: var(--primary-color); }
-.nav-links { display: flex; gap: 10px; align-items: center; }
+.nav-brand { 
+    font-size: 20px; 
+    font-weight: bold; 
+    color: var(--primary-color); 
+}
+
+/* BOUTON BURGER (VISIBLE UNIQUEMENT SUR MOBILE) */
+.burger-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+}
+
+.burger-bar {
+    width: 100%;
+    height: 3px;
+    background-color: var(--text-color);
+    border-radius: 3px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Animation du burger en "X" quand il est ouvert */
+.burger-menu[aria-expanded="true"] .burger-bar:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+.burger-menu[aria-expanded="true"] .burger-bar:nth-child(2) {
+    opacity: 0;
+}
+.burger-menu[aria-expanded="true"] .burger-bar:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+/* MENU DÉROULANT MOBILE (MOBILE-FIRST) */
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: calc(var(--navbar-height) + env(safe-area-inset-top));
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 20px;
+    box-sizing: border-box;
+    gap: 12px;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+    
+    /* Cache le menu par défaut sur mobile en utilisant le transform pour de meilleures performances */
+    transform: translateY(-120%);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Classe active déclenchée par le JS */
+.nav-links.is-open {
+    transform: translateY(0);
+}
 
 .nav-btn {
-    background: transparent; border: none; padding: 8px 16px;
-    font-size: 14px; font-weight: 600; color: #555; border-radius: 6px;
-    cursor: pointer; transition: all 0.2s;
+    background: transparent; 
+    border: none; 
+    padding: 12px 16px; /* Zone de clic agrandie pour mobile */
+    font-size: 15px; 
+    font-weight: 600; 
+    color: #555; 
+    border-radius: 6px;
+    cursor: pointer; 
+    transition: all 0.2s;
+    text-align: left; /* Aligné à gauche sur mobile */
+    width: 100%;
+    display: block;
 }
-.nav-btn:hover { background-color: #f1f3f5; color: #000; }
+
+.nav-btn:hover, .nav-btn:focus { background-color: #f1f3f5; color: #000; }
 .nav-btn.active { background-color: var(--primary-color); color: white; }
 
-.btn-nav-success { color: var(--success-color); }
-.btn-nav-success:hover { background-color: #e2f0d9; color: var(--success-color); }
-.btn-nav-warning { color: #856404; cursor: pointer; }
-.btn-nav-warning:hover { background-color: #fff3cd; color: #856404; }
+.btn-nav-success { color: var(--success-color); border: 1px solid rgba(40, 167, 69, 0.2); }
+.btn-nav-success:hover { background-color: #e2f0d9; }
+.btn-nav-warning { color: #856404; border: 1px solid rgba(255, 193, 7, 0.3); }
+.btn-nav-warning:hover { background-color: #fff3cd; }
+
+.nav-separator {
+    border: 0;
+    height: 1px;
+    background: var(--border-color);
+    margin: 5px 0;
+}
+
+/* 💻 COMPORTEMENT DESKTOP (MEDIA QUERY) */
+@media (min-width: 768px) {
+    .burger-menu {
+        display: none; /* Cache le bouton burger */
+    }
+
+    .nav-links {
+        position: static; /* Réinitialise le positionnement absolu mobile */
+        flex-direction: row; /* Aligne les boutons horizontalement */
+        width: auto;
+        padding: 0;
+        box-shadow: none;
+        border-bottom: none;
+        transform: translateY(0); /* Toujours visible */
+        gap: 10px;
+    }
+
+    .nav-btn {
+        width: auto;
+        text-align: center;
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .nav-separator {
+        display: none; /* Cache le séparateur sur desktop */
+    }
+}
 
 /* VISIBILITÉ ONGLETS */
 .vue-onglet { display: none; }

@@ -18,7 +18,7 @@ if (configurationInitiale) {
     authInstruction.textContent = "Première configuration : Définissez votre code PIN d'accès secret.";
 }
 
-btnLogin.addEventListener('click', function() {
+btnLogin.addEventListener('click', function () {
     const pinSaisi = pinInput.value;
     if (pinSaisi.length < 4) {
         alert("Le code PIN doit comporter au moins 4 chiffres.");
@@ -52,13 +52,13 @@ function afficherErreurAuthentification() {
 
 function initialiserIndexedDB() {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = function(e) {
+    request.onupgradeneeded = function (e) {
         let dbInstance = e.target.result;
         if (!dbInstance.objectStoreNames.contains(STORE_NAME)) {
             dbInstance.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
         }
     };
-    request.onsuccess = function(e) {
+    request.onsuccess = function (e) {
         db = e.target.result;
         initialiserLesGraphiquesStyleCapture();
         rafraichirInterface();
@@ -70,7 +70,7 @@ function initialiserIndexedDB() {
 // ==========================================
 const navButtons = document.querySelectorAll('.nav-btn[data-target]');
 navButtons.forEach(button => {
-    button.addEventListener('click', function() {
+    button.addEventListener('click', function () {
         basculerVersOnglet(this.getAttribute('data-target'));
     });
 });
@@ -78,10 +78,10 @@ navButtons.forEach(button => {
 function basculerVersOnglet(idSection) {
     document.querySelectorAll('.vue-onglet').forEach(el => el.classList.remove('vue-active'));
     document.querySelectorAll('.nav-btn[data-target]').forEach(btn => btn.classList.remove('active'));
-    
+
     document.getElementById(idSection).classList.add('vue-active');
     const cibleBouton = document.querySelector(`.nav-btn[data-target="${idSection}"]`);
-    if(cibleBouton) cibleBouton.classList.add('active');
+    if (cibleBouton) cibleBouton.classList.add('active');
 }
 
 // ==========================================
@@ -170,7 +170,7 @@ function genererIdentifiantPatient(pathologie, age, sexe) {
     return `${prefixe}-${age}${codeSexe}-${aleatoire}`;
 }
 
-form.addEventListener('submit', function(e) {
+form.addEventListener('submit', function (e) {
     e.preventDefault();
     const pathologie = document.getElementById('p-pathologie').value.trim();
     const age = parseInt(document.getElementById('p-age').value);
@@ -211,20 +211,20 @@ function recupererTousLesExamensDechiffres(callback) {
     const store = transaction.objectStore(STORE_NAME);
     const requestAll = store.getAll();
 
-    requestAll.onsuccess = function() {
+    requestAll.onsuccess = function () {
         const resultats = [];
         requestAll.result.forEach(item => {
             try {
                 const octets = CryptoJS.AES.decrypt(item.payload, CLE_CHIFFREMENT);
                 resultats.push(JSON.parse(octets.toString(CryptoJS.enc.Utf8)));
-            } catch(e) { console.error("Erreur de décryptage d'une ligne."); }
+            } catch (e) { console.error("Erreur de décryptage d'une ligne."); }
         });
         callback(resultats);
     };
 }
 
 function rafraichirInterface() {
-    recupererTousLesExamensDechiffres(function(examens) {
+    recupererTousLesExamensDechiffres(function (examens) {
         construireDashboard(examens);
         calculerEtAfficherAnalysesGlobales();
     });
@@ -237,10 +237,10 @@ function alimenterFiltrePathologies(examens) {
     const selectPatho = document.getElementById('analys-patho');
     const memo = selectPatho.value;
     const uniques = [...new Set(examens.map(e => e.pathologie.trim()))].sort();
-    
+
     selectPatho.innerHTML = '<option value="">-- Toutes les pathologies --</option>';
     uniques.forEach(patho => {
-        if(patho) {
+        if (patho) {
             const opt = document.createElement('option');
             opt.value = patho.toLowerCase(); opt.textContent = patho;
             selectPatho.appendChild(opt);
@@ -250,7 +250,7 @@ function alimenterFiltrePathologies(examens) {
 }
 
 function calculerEtAfficherAnalysesGlobales() {
-    recupererTousLesExamensDechiffres(function(tousExamens) {
+    recupererTousLesExamensDechiffres(function (tousExamens) {
         alimenterFiltrePathologies(tousExamens);
 
         const fPatho = document.getElementById('analys-patho').value;
@@ -314,7 +314,7 @@ function construireDashboard(examens) {
     const derniersStatuts = {};
     examens.forEach(e => { derniersStatuts[e.identifiant] = e; });
     dashboardBody.innerHTML = "";
-    
+
     for (const id in derniersStatuts) {
         const e = derniersStatuts[id];
         const ratio = (e.crp / e.vsh).toFixed(2);
@@ -325,18 +325,18 @@ function construireDashboard(examens) {
         tr.innerHTML = `
             <td><strong>${e.identifiant}</strong></td>
             <td>${e.pathologie}</td>
-            <td>${e.crp >= 100 ? '<span class="badge-alerte">'+e.crp+'</span>' : e.crp}</td>
+            <td>${e.crp >= 100 ? '<span class="badge-alerte">' + e.crp + '</span>' : e.crp}</td>
             <td>${e.vsh}</td>
             <td>${ratio}</td>
             <td>${e.dateSaisie}</td>
         `;
 
-        tr.addEventListener('click', function() {
+        tr.addEventListener('click', function () {
             // Au clic, on configure les filtres globaux sur la pathologie de la ligne sélectionnée
             document.getElementById('analys-patho').value = e.pathologie.toLowerCase();
             document.getElementById('analys-sexe').value = "";
             document.getElementById('analys-age-tranche').value = "";
-            
+
             calculerEtAfficherAnalysesGlobales();
             basculerVersOnglet('section-courbe');
         });
@@ -351,8 +351,8 @@ filtreTableauCRP.addEventListener('input', () => recupererTousLesExamensDechiffr
 // ==========================================
 // 7. GESTION DES BACKUPS (EXPORT ET IMPORT)
 // ==========================================
-document.getElementById('btn-export-nav').addEventListener('click', function() {
-    recupererTousLesExamensDechiffres(function(examens) {
+document.getElementById('btn-export-nav').addEventListener('click', function () {
+    recupererTousLesExamensDechiffres(function (examens) {
         if (examens.length === 0) return;
         let csv = "\uFEFFPatient_ID;Nom_Patient;Lieu_Patient;Pathologie;CRP;VSH;Sexe;Age;Date_Examen\n";
         examens.forEach(p => {
@@ -366,14 +366,14 @@ document.getElementById('btn-export-nav').addEventListener('click', function() {
     });
 });
 
-document.getElementById('input-import').addEventListener('change', function(event) {
+document.getElementById('input-import').addEventListener('change', function (event) {
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const lignes = e.target.result.split('\n');
         let count = 0;
-        for(let i = 1; i < lignes.length; i++) {
+        for (let i = 1; i < lignes.length; i++) {
             const cols = lignes[i].trim().split(';');
             if (cols.length < 9) continue;
             const examData = {
@@ -381,14 +381,57 @@ document.getElementById('input-import').addEventListener('change', function(even
                 pathologie: cols[3].replace(/"/g, ''), crp: parseInt(cols[4]), vsh: parseInt(cols[5]),
                 sexe: cols[6], age: parseInt(cols[7]), dateSaisie: cols[8]
             };
-            ajouterExamenEnBase(examData, () => {});
+            ajouterExamenEnBase(examData, () => { });
             count++;
         }
-        setTimeout(() => { 
-            alert(`${count} dossiers importés et rechiffrés.`); 
-            rafraichirInterface(); 
+        setTimeout(() => {
+            alert(`${count} dossiers importés et rechiffrés.`);
+            rafraichirInterface();
             basculerVersOnglet('section-courbe');
         }, 500);
     };
     reader.readAsText(file);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const burgerToggle = document.getElementById("burger-toggle");
+    const navLinks = document.getElementById("nav-links");
+    const navButtons = document.querySelectorAll(".nav-btn");
+
+    // Fonction pour basculer le menu
+    function toggleMenu() {
+        const isOpen = navLinks.classList.contains("is-open");
+
+        if (isOpen) {
+            navLinks.classList.remove("is-open");
+            burgerToggle.setAttribute("aria-expanded", "false");
+        } else {
+            navLinks.classList.add("is-open");
+            burgerToggle.setAttribute("aria-expanded", "true");
+        }
+    }
+
+    // Événement clic sur le burger
+    burgerToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleMenu();
+    });
+
+    // Fermer le menu si on clique sur un bouton de navigation (Utile sur Mobile)
+    navButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            if (window.innerWidth < 768) {
+                navLinks.classList.remove("is-open");
+                burgerToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+    });
+
+    // Fermer le menu si on clique n'importe où à l'extérieur de la navbar
+    document.addEventListener("click", (e) => {
+        if (window.innerWidth < 768 && !navLinks.contains(e.target) && e.target !== burgerToggle) {
+            navLinks.classList.remove("is-open");
+            burgerToggle.setAttribute("aria-expanded", "false");
+        }
+    });
 });

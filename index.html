@@ -1,177 +1,193 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Registre Sécurisé CRP / VSH Pro</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007bff">
     <link rel="stylesheet" href="style.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="js/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
+
 <body>
 
-<div id="auth-overlay">
-    <div class="auth-card">
-        <h2>🔒 Accès Sécurisé</h2>
-        <p id="auth-instruction">Veuillez saisir votre code PIN pour déverrouiller et déchiffrer la base de données.</p>
-        <input type="password" id="pin-input" placeholder="Code PIN" maxlength="8">
-        <button id="btn-login" class="btn btn-primary">Déverrouiller l'accès</button>
-        <p id="auth-error">Code PIN incorrect ou échec de déchiffrement.</p>
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h2>🔒 Accès Sécurisé</h2>
+            <p id="auth-instruction">Veuillez saisir votre code PIN pour déverrouiller et déchiffrer la base de données.
+            </p>
+            <input type="password" id="pin-input" placeholder="Code PIN" maxlength="8">
+            <button id="btn-login" class="btn btn-primary">Déverrouiller l'accès</button>
+            <p id="auth-error">Code PIN incorrect ou échec de déchiffrement.</p>
+        </div>
     </div>
-</div>
 
-<nav class="navbar">
-    <div class="nav-brand">🩺 RegMedPro</div>
-    <div class="nav-links">
-        <button class="nav-btn active" data-target="section-saisie">📝 Saisie Examen</button>
-        <button class="nav-btn" data-target="section-dashboard">📊 Tableau de Bord</button>
-        <button class="nav-btn" data-target="section-courbe">📈 Courbe & Analyse</button>
-        <button id="btn-export-nav" class="nav-btn btn-nav-success">💾 Exporter CSV</button>
-        <label class="nav-btn btn-nav-warning">
-            📂 Importer CSV
-            <input type="file" id="input-import" accept=".csv" style="display: none;">
-        </label>
-    </div>
-</nav>
+    <nav class="navbar" role="navigation" aria-label="Navigation principale">
+        <div class="nav-brand">🩺 RegMedPro</div>
 
-<div class="app-container">
+        <button class="burger-menu" id="burger-toggle" aria-expanded="false" aria-controls="nav-links"
+            aria-label="Ouvrir le menu de navigation">
+            <span class="burger-bar"></span>
+            <span class="burger-bar"></span>
+            <span class="burger-bar"></span>
+        </button>
 
-    <div id="section-saisie" class="section-box vue-onglet vue-active">
-        <h2>Saisie d'un nouvel examen (Données Augmentées)</h2>
-        <form id="form-collecte">
-            <div class="form-grid">
+        <div class="nav-links" id="nav-links">
+            <button class="nav-btn active" data-target="section-saisie">📝 Saisie Examen</button>
+            <button class="nav-btn" data-target="section-dashboard">📊 Tableau de Bord</button>
+            <button class="nav-btn" data-target="section-courbe">📈 Courbe & Analyse</button>
+
+            <hr class="nav-separator"> <button id="btn-export-nav" class="nav-btn btn-nav-success">💾 Exporter
+                CSV</button>
+            <label class="nav-btn btn-nav-warning">
+                📂 Importer CSV
+                <input type="file" id="input-import" accept=".csv" style="display: none;">
+            </label>
+        </div>
+    </nav>
+
+    <div class="app-container">
+
+        <div id="section-saisie" class="section-box vue-onglet vue-active">
+            <h2>Saisie d'un nouvel examen (Données Augmentées)</h2>
+            <form id="form-collecte">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="p-nom">Nom complet de la patiente</label>
+                        <input type="text" id="p-nom" placeholder="Ex: Marie Dupont" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="p-lieu">Lieu / Ville de résidence</label>
+                        <input type="text" id="p-lieu" placeholder="Ex: Lyon" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="p-pathologie">Pathologie / Diagnostic</label>
+                        <input type="text" id="p-pathologie" placeholder="Ex: Tuberculose" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="p-crp">CRP (mg/L)</label>
+                        <input type="number" id="p-crp" min="0" placeholder="Ex: 50" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="p-vsh">VSH (mm/h)</label>
+                        <input type="number" id="p-vsh" min="0" placeholder="Ex: 90" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="p-sexe">Sexe biologique</label>
+                        <select id="p-sexe" required>
+                            <option value="Femme">Femme</option>
+                            <option value="Homme">Homme</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="p-age">Âge (ans)</label>
+                        <input type="number" id="p-age" min="0" max="120" placeholder="Ex: 33" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="p-date">Date de l'examen</label>
+                        <input type="date" id="p-date" required>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; text-align: right;">
+                    <button type="submit" class="btn btn-primary">Générer l'ID & Chiffrer</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="section-dashboard" class="section-box vue-onglet vue-cachee">
+            <h2>📊 Tableau de Bord Global du Registre</h2>
+            <p class="info-bulle">💡 Cliquez sur une ligne du tableau pour basculer vers l'onglet Analyse Globale
+                pré-filtré.</p>
+            <div class="form-grid" style="margin-bottom: 15px; background: #f1f3f5; padding: 15px; border-radius: 6px;">
                 <div class="form-group">
-                    <label for="p-nom">Nom complet de la patiente</label>
-                    <input type="text" id="p-nom" placeholder="Ex: Marie Dupont" required>
+                    <label for="filtre-pathologie">Filtrer par Pathologie (Tableau)</label>
+                    <input type="text" id="filtre-pathologie" placeholder="Ex: Lupus">
                 </div>
                 <div class="form-group">
-                    <label for="p-lieu">Lieu / Ville de résidence</label>
-                    <input type="text" id="p-lieu" placeholder="Ex: Lyon" required>
+                    <label for="filtre-crp">Seuil Alerte CRP (>=</label>
+                    <input type="number" id="filtre-crp" placeholder="Ex: 100">
+                </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>ID Patient</th>
+                            <th>Pathologie/Contexte</th>
+                            <th>Dernière CRP</th>
+                            <th>Dernière VSH</th>
+                            <th>Ratio</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dashboard-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="section-courbe" class="section-box vue-onglet vue-cachee">
+            <h2>Analyse Comparative Globale : CRP vs VSH (PWA Tool)</h2>
+
+            <div class="form-grid filters-capture-style" style="margin-bottom: 25px;">
+                <div class="form-group">
+                    <label for="analys-patho">Pathologie / Situation Clinique</label>
+                    <select id="analys-patho">
+                        <option value="">-- Toutes les pathologies --</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label for="p-pathologie">Pathologie / Diagnostic</label>
-                    <input type="text" id="p-pathologie" placeholder="Ex: Tuberculose" required>
+                    <label for="analys-age-tranche">Tranche d'Âge</label>
+                    <select id="analys-age-tranche">
+                        <option value="">-- Toutes les tranches --</option>
+                        <option value="Enfant">Enfant (&lt; 18 ans)</option>
+                        <option value="Adulte">Adulte (18 - 65 ans)</option>
+                        <option value="Sénior">Sénior (&gt; 65 ans)</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label for="p-crp">CRP (mg/L)</label>
-                    <input type="number" id="p-crp" min="0" placeholder="Ex: 50" required>
-                </div>
-                <div class="form-group">
-                    <label for="p-vsh">VSH (mm/h)</label>
-                    <input type="number" id="p-vsh" min="0" placeholder="Ex: 90" required>
-                </div>
-                <div class="form-group">
-                    <label for="p-sexe">Sexe biologique</label>
-                    <select id="p-sexe" required>
+                    <label for="analys-sexe">Sexe</label>
+                    <select id="analys-sexe">
+                        <option value="">-- Tous les sexes --</option>
                         <option value="Femme">Femme</option>
                         <option value="Homme">Homme</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="p-age">Âge (ans)</label>
-                    <input type="number" id="p-age" min="0" max="120" placeholder="Ex: 33" required>
+            </div>
+
+            <div class="gauges-flex-container">
+                <div class="gauge-card">
+                    <h3>Moyenne CRP (Protéine C-Réactive) (mg/L)</h3>
+                    <div class="canvas-gauge-holder">
+                        <canvas id="gaugeCRP"></canvas>
+                        <div class="gauge-digital-value" id="val-digital-crp">0 mg/L</div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="p-date">Date de l'examen</label>
-                    <input type="date" id="p-date" required>
+                <div class="gauge-card">
+                    <h3>Moyenne VSH (Vitesse de Sédimentation) (mm/h)</h3>
+                    <div class="canvas-gauge-holder">
+                        <canvas id="gaugeVSH"></canvas>
+                        <div class="gauge-digital-value" id="val-digital-vsh">0 mm/h</div>
+                    </div>
                 </div>
             </div>
-            <div style="margin-top: 15px; text-align: right;">
-                <button type="submit" class="btn btn-primary">Générer l'ID & Chiffrer</button>
+
+            <div style="margin-top: 25px;">
+                <h3 style="font-size: 14px; color: #555; margin-bottom: 10px;">Vitesse relative d'augmentation moyenne
+                    des marqueurs</h3>
+                <div style="height: 180px; position: relative;">
+                    <canvas id="barChartVitesse"></canvas>
+                </div>
             </div>
-        </form>
+        </div>
+
     </div>
 
-    <div id="section-dashboard" class="section-box vue-onglet vue-cachee">
-        <h2>📊 Tableau de Bord Global du Registre</h2>
-        <p class="info-bulle">💡 Cliquez sur une ligne du tableau pour basculer vers l'onglet Analyse Globale pré-filtré.</p>
-        <div class="form-grid" style="margin-bottom: 15px; background: #f1f3f5; padding: 15px; border-radius: 6px;">
-            <div class="form-group">
-                <label for="filtre-pathologie">Filtrer par Pathologie (Tableau)</label>
-                <input type="text" id="filtre-pathologie" placeholder="Ex: Lupus">
-            </div>
-            <div class="form-group">
-                <label for="filtre-crp">Seuil Alerte CRP (>=</label>
-                <input type="number" id="filtre-crp" placeholder="Ex: 100">
-            </div>
-        </div>
-
-        <div style="overflow-x: auto;">
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>ID Patient</th>
-                        <th>Pathologie/Contexte</th>
-                        <th>Dernière CRP</th>
-                        <th>Dernière VSH</th>
-                        <th>Ratio</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody id="dashboard-body"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="section-courbe" class="section-box vue-onglet vue-cachee">
-        <h2>Analyse Comparative Globale : CRP vs VSH (PWA Tool)</h2>
-        
-        <div class="form-grid filters-capture-style" style="margin-bottom: 25px;">
-            <div class="form-group">
-                <label for="analys-patho">Pathologie / Situation Clinique</label>
-                <select id="analys-patho">
-                    <option value="">-- Toutes les pathologies --</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="analys-age-tranche">Tranche d'Âge</label>
-                <select id="analys-age-tranche">
-                    <option value="">-- Toutes les tranches --</option>
-                    <option value="Enfant">Enfant (&lt; 18 ans)</option>
-                    <option value="Adulte">Adulte (18 - 65 ans)</option>
-                    <option value="Sénior">Sénior (&gt; 65 ans)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="analys-sexe">Sexe</label>
-                <select id="analys-sexe">
-                    <option value="">-- Tous les sexes --</option>
-                    <option value="Femme">Femme</option>
-                    <option value="Homme">Homme</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="gauges-flex-container">
-            <div class="gauge-card">
-                <h3>Moyenne CRP (Protéine C-Réactive) (mg/L)</h3>
-                <div class="canvas-gauge-holder">
-                    <canvas id="gaugeCRP"></canvas>
-                    <div class="gauge-digital-value" id="val-digital-crp">0 mg/L</div>
-                </div>
-            </div>
-            <div class="gauge-card">
-                <h3>Moyenne VSH (Vitesse de Sédimentation) (mm/h)</h3>
-                <div class="canvas-gauge-holder">
-                    <canvas id="gaugeVSH"></canvas>
-                    <div class="gauge-digital-value" id="val-digital-vsh">0 mm/h</div>
-                </div>
-            </div>
-        </div>
-
-        <div style="margin-top: 25px;">
-            <h3 style="font-size: 14px; color: #555; margin-bottom: 10px;">Vitesse relative d'augmentation moyenne des marqueurs</h3>
-            <div style="height: 180px; position: relative;">
-                <canvas id="barChartVitesse"></canvas>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<script src="js/app.js"></script>
+    <script src="js/app.js"></script>
 </body>
+
 </html>
