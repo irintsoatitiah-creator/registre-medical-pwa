@@ -11,7 +11,11 @@ const FILES_TO_CACHE = [
 ];
 
 self.addEventListener('install', (e) => {
-    e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE)));
+    e.waitUntil(
+        caches.open(CACHE_NAME)
+            .then((cache) => cache.addAll(FILES_TO_CACHE))
+            .then(() => self.skipWaiting()) // <-- Force l'activation immédiate sans attendre la fermeture de l'app
+    );
 });
 
 self.addEventListener('fetch', (e) => {

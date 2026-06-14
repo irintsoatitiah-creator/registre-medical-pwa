@@ -222,3 +222,59 @@ input:focus, select:focus { border-color: var(--primary-color); }
 .info-bulle { font-size: 13px; color: #666; margin-top: -5px; margin-bottom: 15px; }
 .btn { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
 .btn-primary { background: #007bff; color: white; }
+
+
+/* BANNIÈRE D'INSTALLATION PWA */
+.install-banner {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.install-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
+    font-size: 14px;
+}
+
+.install-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.btn-install-action {
+    background-color: var(--success-color);
+    color: white;
+    padding: 8px 20px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-install-close {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: underline;
+}
+
+/* Version Desktop : On l'adapte ou on la rend plus discrète */
+@media (min-width: 768px) {
+    .install-content {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+    }
+}
