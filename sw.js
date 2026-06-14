@@ -6,6 +6,7 @@ const FILES_TO_CACHE = [
     './js/app.js',
     './js/chart.js',
     './js/register-sw.js',
+    './js/crypto-js.min.js',
     './manifest.json'
 ];
 
